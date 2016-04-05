@@ -6,21 +6,23 @@ int count = 0;
 float[] hsbVals = new float[3];
 
 void setup() {
-  size(640, 480);
+  size(960, 540);
   colorMode(HSB);
   String[] cameras = Capture.list();
   for (int i = 0; i < cameras.length; i++) {
     println("["+i+"]: "+cameras[i]);
   }
 
-  cam = new Capture(this, cameras[14]);
+  cam = new Capture(this, cameras[3]);
   cam.start();
 }
 
 void draw() {
   if (cam.available() == true) {
     cam.read();
-
+    
+    boolean[] goodPix = new boolean[cam.pixels.length];
+    
 
     cam.loadPixels();
     for (int i = 0; i < cam.pixels.length; i++) {
@@ -38,7 +40,7 @@ void draw() {
     
     float[] point2 = Color.RGBtoHSB(r, g, b, hsbVals);
     
-    println("("+map(point2[0], 0, 1, 0, 360)+", "+map(point2[1], 0, 1, 0, 100)+", "+map(point2[2], 0, 1, 0, 100)+")");
+    //println("("+map(point2[0], 0, 1, 0, 360)+", "+map(point2[1], 0, 1, 0, 100)+", "+map(point2[2], 0, 1, 0, 100)+")");
     cam.updatePixels();
   }
 
