@@ -53,6 +53,11 @@ void draw() {
   image(cam, 0, 0, width, height); //set(0, 0, cam);
 }
 
+public int search(Node node) {
+  println("X: "+node.nodeX+" Y: "+node.nodeY);
+}
+
+
 public void flood(int start, float low, float high) {
   
 }
