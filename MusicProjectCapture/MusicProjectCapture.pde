@@ -1,5 +1,6 @@
 import processing.video.*;
 import java.awt.*;
+import java.util.*;
 
 Capture cam;
 int count = 0;
@@ -22,12 +23,17 @@ void draw() {
     cam.read();
     
     boolean[] goodPix = new boolean[cam.pixels.length];
+    for (int i = 0; i < cam.pixels.length; i++) {
+      goodPix[i] = true;
+    }
+    LinkedList<colorObject> seenObjects = new LinkedList<colorObject>();
     
 
     cam.loadPixels();
     for (int i = 0; i < cam.pixels.length; i++) {
-      if (hue(cam.pixels[i]) > 100 && hue(cam.pixels[i]) < 140) {
-        cam.pixels[i] = color(0, 0, 0);
+      if (goodPix[i]) {
+         goodPix[i] = false;
+         seenObjects.add(new colorObject(hue(cam.pixels[i])-5, hue(cam.pixels[i])+5, i%width, (int)(i/width)));
       }
     }
     loadPixels();
@@ -45,4 +51,8 @@ void draw() {
   }
 
   image(cam, 0, 0, width, height); //set(0, 0, cam);
+}
+
+public void flood(int start, float low, float high) {
+  
 }
