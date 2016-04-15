@@ -6,7 +6,16 @@ Capture cam;
 int count = 0;
 float[] hsbVals = new float[3];
 
+Tree tree = new Tree(0, 0);
+
+String searchReturn = "";
+
 void setup() {
+  tree.add(1, 0, 0, 0);
+  tree.add(1, 1, 1, 0);
+  tree.add(1, 2, 1, 1);
+  tree.add(2, 2, 1, 2);
+  flood(0, 0, 0);
   size(960, 540);
   colorMode(HSB);
   String[] cameras = Capture.list();
@@ -53,11 +62,12 @@ void draw() {
   image(cam, 0, 0, width, height); //set(0, 0, cam);
 }
 
-public int search(Node node) {
-  println("X: "+node.nodeX+" Y: "+node.nodeY);
+public void search(Node node) {
+  if (node.parent != null)
+    println("Node: ("+node.nodeX+", "+node.nodeY+")  Parent: "+"("+node.parent.nodeX+", "+node.parent.nodeY+")");
 }
 
 
 public void flood(int start, float low, float high) {
-  
+  tree.traverseDF(tree._root, false, 0, 0);
 }
