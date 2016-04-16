@@ -2,8 +2,8 @@ public class Tree {
 
   public Node _root;
 
-  public Tree(int x, int y) {
-    Node node = new Node(x, y);
+  public Tree(int x, int y, float c) {
+    Node node = new Node(x, y, c);
     this._root = node;
   }
 
@@ -22,23 +22,39 @@ public class Tree {
 
   public Node traverseDF(Node currentNode, boolean add, int px, int py) {
     if (add) {
-        if (currentNode.nodeX == px && currentNode.nodeY == py) {
-          return currentNode;
-        }
+      if (currentNode.nodeX == px && currentNode.nodeY == py) {
+        return currentNode;
       }
-      else {
-        search(currentNode);
-      }
-    for (int i = 0; i < currentNode.children.size(); i++) {
-      if (add) {
-        if (currentNode.children.get(i).nodeX == px && currentNode.children.get(i).nodeY == py) {
-          return currentNode.children.get(i);
-        }
-      } else {
-        search(currentNode.children.get(i));
-      }
-      this.traverseDF(currentNode.children.get(i), add, px, py);
+    } else {
+      search(currentNode);
     }
+
+    Iterator<Node>iterator = currentNode.children.iterator(); //WIP
+    while (iterator.hasNext()) {
+      Node child = iterator.next();
+      if (!iterator.hasNext() ) {
+        if (add) {
+          if (currentNode.children.get(i).nodeX == px && currentNode.children.get(i).nodeY == py) {
+            return currentNode.children.get(i);
+          }
+        } else {
+          search(currentNode.children.get(i));
+        }
+      }
+      child.printTree(subPrefix, nextSelf, nextSub);
+    }
+
+
+    /*for (int i = 0; i < currentNode.children.size(); i++) {
+     if (add) {
+     if (currentNode.children.get(i).nodeX == px && currentNode.children.get(i).nodeY == py) {
+     return currentNode.children.get(i);
+     }
+     } else {
+     search(currentNode.children.get(i));
+     }
+     return this.traverseDF(currentNode.children.get(i), add, px, py);
+     }*/
     return null;
   }
 
@@ -48,8 +64,8 @@ public class Tree {
    };
    */
 
-  public void add(int x, int y, int px, int py) {
-    Node child = new Node(x, y);
+  public void add(int x, int y, float c, int px, int py) {
+    Node child = new Node(x, y, c);
     Node parent = null;
 
     parent = this.traverseDF(this._root, true, px, py);
