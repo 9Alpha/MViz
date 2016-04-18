@@ -20,10 +20,10 @@ void setup() {
   colorMode(HSB, 1);
   String[] cameras = Capture.list();
   for (int i = 0; i < cameras.length; i++) {
-    //println("["+i+"]: "+cameras[i]);
+    println("["+i+"]: "+cameras[i]);
   }
 
-  cam = new Capture(this, cameras[18]);
+  cam = new Capture(this, cameras[3]);
   cam.start();
 }
 
@@ -75,9 +75,9 @@ void draw() {
 
 public void search(Node node) {
   if (node.parent != null) {
-    fill(color(node.col, .7, .7));
-    point(node.nodeX, node.nodeY);
-    //println("Node: ("+node.nodeX+", "+node.nodeY+")  Parent: "+"("+node.parent.nodeX+", "+node.parent.nodeY+")");
+    //fill(color(node.col, .7, .7));
+    //point(node.nodeX, node.nodeY);
+    println("Node: ("+node.nodeX+", "+node.nodeY+")  Parent: "+"("+node.parent.nodeX+", "+node.parent.nodeY+")");
   }
 }
 

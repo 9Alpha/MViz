@@ -28,36 +28,38 @@ public class Tree {
     } else {
       search(currentNode);
     }
-
     Iterator<Node>iterator = currentNode.children.iterator(); //WIP
     while (iterator.hasNext()) {
       Node child = iterator.next();
-      if (!iterator.hasNext() ) {
+      if (!iterator.hasNext()) {
         if (add) {
-          if (currentNode.children.get(i).nodeX == px && currentNode.children.get(i).nodeY == py) {
-            return currentNode.children.get(i);
+          if (child.nodeX == px && child.nodeY == py) {
+            return child;
           }
-        } else {
-          search(currentNode.children.get(i));
         }
       }
-      child.printTree(subPrefix, nextSelf, nextSub);
+      if (!add) {
+        search(child);
+      }
     }
-
-
-    /*for (int i = 0; i < currentNode.children.size(); i++) {
-     if (add) {
-     if (currentNode.children.get(i).nodeX == px && currentNode.children.get(i).nodeY == py) {
-     return currentNode.children.get(i);
-     }
-     } else {
-     search(currentNode.children.get(i));
-     }
-     return this.traverseDF(currentNode.children.get(i), add, px, py);
-     }*/
+    
     return null;
   }
 
+
+  /*for (int i = 0; i < currentNode.children.size(); i++) {
+   if (add) {
+   if (currentNode.children.get(i).nodeX == px && currentNode.children.get(i).nodeY == py) {
+   return currentNode.children.get(i);
+   }
+   } else {
+   search(currentNode.children.get(i));
+   }
+   return this.traverseDF(currentNode.children.get(i), add, px, py);
+   }
+   return null;
+   }
+   */
   /*
   public void contains(callback, traversal) {
    traverseDF(this, callback);
