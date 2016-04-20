@@ -2,8 +2,8 @@ public class Tree {
 
   public Node _root;
 
-  public Tree(int x, int y, float c) {
-    Node node = new Node(x, y, c);
+  public Tree(int x, int y, float h, float s, float b) {
+    Node node = new Node(x, y, h, s, b);
     this._root = node;
   }
 
@@ -28,19 +28,22 @@ public class Tree {
     } else {
       search(currentNode);
     }
-    Iterator<Node>iterator = currentNode.children.iterator(); //WIP
+    Iterator<Node> iterator = currentNode.children.iterator(); //WIP
     while (iterator.hasNext()) {
       Node child = iterator.next();
-      if (!iterator.hasNext()) {
-        if (add) {
-          if (child.nodeX == px && child.nodeY == py) {
-            return child;
-          }
-        }
-      }
       if (!add) {
         search(child);
       }
+      if (!iterator.hasNext()) {
+        if (add) {
+          if (child.nodeX == px && child.nodeY == py) {
+            return child;   
+          }
+        }
+        iterator = child.children.iterator();
+        //this.traverseDF(child, add, px, py);
+      }
+      
     }
     
     return null;
@@ -66,8 +69,8 @@ public class Tree {
    };
    */
 
-  public void add(int x, int y, float c, int px, int py) {
-    Node child = new Node(x, y, c);
+  public void add(int x, int y, float h, float s, float b, int px, int py) {
+    Node child = new Node(x, y, h, s, b);
     Node parent = null;
 
     parent = this.traverseDF(this._root, true, px, py);
