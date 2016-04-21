@@ -1,8 +1,7 @@
+
 import processing.sound.*;
 Amplitude Amp;
 AudioIn in;
-
-
 
 int[] array = new int[5000];
 int index = 0;
@@ -15,11 +14,12 @@ void setup() {
   background(255);
   textSize(32);
   fill(0);
-  
+
   Amp = new Amplitude(this);
   in = new AudioIn(this, 0);
   in.start();
   Amp.input(in);
+
   /*
   for(int i = 0; i < array.length; i++) {
      array[i] = (int)(25*Math.sin(i/20.0*speed));
@@ -32,8 +32,10 @@ int start = 0;
 int end = 500 - speed;
 void draw() {
   //println(speed);
+
   //buffer[start] = (int)(amp*(int)(25*Math.sin(index/20.0*freq)));
   buffer[start] = (int)(Amp.analyze()*500);
+
   if(start >= buffer.length - speed) {
     start = 0;
     end +=speed;
@@ -52,8 +54,10 @@ void draw() {
     index++;
   
   //if(start%50 == 0) 
+
   printWave(buffer,start,end);
   //printBars(buffer, start, end);
+
   
 }
 
@@ -121,4 +125,5 @@ void printArray(int[] a) {
   for(int x = 0; x < a.length; x+=2) {
     text(String.valueOf(a[x]), index, 50);
   }
+
 }
