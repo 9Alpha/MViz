@@ -1,8 +1,12 @@
-//fix lines
+import processing.sound.*;
+Amplitude Amp;
+AudioIn in;
+
+
 
 int[] array = new int[5000];
 int index = 0;
-int speed = 8;
+int speed = 4;
 double amp = 1;
 float freq = speed;
 
@@ -11,6 +15,11 @@ void setup() {
   background(255);
   textSize(32);
   fill(0);
+  
+  Amp = new Amplitude(this);
+  in = new AudioIn(this, 0);
+  in.start();
+  Amp.input(in);
   /*
   for(int i = 0; i < array.length; i++) {
      array[i] = (int)(25*Math.sin(i/20.0*speed));
@@ -23,7 +32,8 @@ int start = 0;
 int end = 500 - speed;
 void draw() {
   //println(speed);
-  buffer[start] = (int)(amp*(int)(25*Math.sin(index/20.0*freq)));
+  //buffer[start] = (int)(amp*(int)(25*Math.sin(index/20.0*freq)));
+  buffer[start] = (int)(Amp.analyze()*500);
   if(start >= buffer.length - speed) {
     start = 0;
     end +=speed;
@@ -43,10 +53,8 @@ void draw() {
   
   //if(start%50 == 0) 
   printWave(buffer,start,end);
+  //printBars(buffer, start, end);
   
-  //println("start: "+start);
-  //println("end: "+end);
-  //println(freq);
 }
 
 void keyPressed() {
@@ -89,7 +97,24 @@ void printWave(int[] wave, int s, int e) {
   
 }
 
+void printBars(int[] wave, int s, int e) {
+  background(255);
+ 
+ int count = 9;
+ 
+ while(count >= 0) {
+  fill(20*count, 255-50*count,0);
+  rect(50*count,90 ,50,-40+1.5*wave[s]);
+  if(s >= wave.length - speed) {
+    s = 0;
+  }
+  else {
+    s+=speed;
+  }
+  count--;
+ }
 
+}
 
 void printArray(int[] a) {
   background(255);
