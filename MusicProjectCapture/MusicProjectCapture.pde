@@ -3,7 +3,7 @@ import java.awt.*;
 import java.util.*;
 
 Capture cam;
-int res = 161;
+int res = 1;
 int count = 0;
 float[] hsbVals = new float[3];
 
@@ -12,12 +12,7 @@ float[] hsbVals = new float[3];
 String searchReturn = "";
 
 void setup() {
-  /* tree.add(1, 0, 0, 0);
-   tree.add(1, 1, 1, 0);
-   tree.add(1, 2, 1, 1);
-   tree.add(2, 2, 1, 2);
-   flood(0, 0, 0);*/
-  size(640, 360);
+  size(320, 180);
   noStroke();
   colorMode(HSB, 1);
   String[] cameras = Capture.list();
@@ -25,7 +20,7 @@ void setup() {
     println("["+i+"]: "+cameras[i]);
   }
 
-  cam = new Capture(this, cameras[9]);
+  cam = new Capture(this, cameras[12]);
   cam.start();
 }
 
@@ -47,7 +42,8 @@ void draw() {
   if (cam.available() == true) {
     cam.read();
 
-    set(0, 0, cam);
+    //set(0, 0, cam);
+    image(cam, 0, 0, width, height);
 
     cam.loadPixels();
 
@@ -61,10 +57,13 @@ void draw() {
 
 
     for (int i = 0; i < cam.pixels.length; i+=res) {
-      if (goodPix[i]) {
+      if (goodPix[i] && hue(cam.pixels[i]) > .8 && saturation(cam.pixels[i]) > .5) {
         goodPix[i] = false;
         colorObject shape = new colorObject(hue(cam.pixels[i])-.01, hue(cam.pixels[i])+.01, saturation(cam.pixels[i]), brightness(cam.pixels[i]), i%width, (int)(i/width));
         seenObjects.add(flood(shape, i, hue(cam.pixels[i])-.01, hue(cam.pixels[i])+.01, goodPix));
+      }
+      else {
+        //rect(i%width, (int)(i/width), 1, 1);
       }
     }
 
@@ -106,8 +105,9 @@ void draw() {
 
 public void search(Node node) {
   if (node.parent != null) {
-    fill(color(node.hue, node.sat, node.bri));
-    rect(node.nodeX, node.nodeY, res, res);
+    //fill(color(node.hue, node.sat, node.bri));
+    fill(0);
+    rect(node.nodeX*4, node.nodeY*16, res*16, res*16);
     //println("Node: ("+node.nodeX+", "+node.nodeY+")  Parent: "+"("+node.parent.nodeX+", "+node.parent.nodeY+")");
   } else {
     //println("Node: ("+node.nodeX+", "+node.nodeY+")  Parent: _root");

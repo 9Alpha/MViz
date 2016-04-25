@@ -17,7 +17,7 @@ void setup() {
     println("["+i+"]: "+cameras[i]);
   }
 
-  cam = new Capture(this, cameras[7]);
+  cam = new Capture(this, cameras[3]);
   cam.start();
 }
 
