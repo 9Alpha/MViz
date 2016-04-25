@@ -51,7 +51,7 @@ void setup() {
 void draw() {
   fft.analyze(spectrum);
   for(int i = 0; i < frequencies; i++) {
-    buffer[start[i]] = (int)(spectrum[i*2]*100);
+    buffer[start[i]] = (int)(spectrum[i]*1000);
     if(start[i] >= (i+1)*500 - speed) {
       start[i] = i*500;
       end[i] +=speed;
