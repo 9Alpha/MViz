@@ -19,11 +19,23 @@ public class colorObject {
   }
   
   public void outPut() {
-     this.pixelList.traverseDF(this.pixelList._root, false, 0, 0); 
+     this.pixelList.traverseDF(this.pixelList._root, 1, 0, 0, false); 
   }
   
-  public void display() {
-      
+  public int avgX() {
+    PixelTotal = 0;
+    CountTotal = 0;
+    this.pixelList.traverseDF(this.pixelList._root, 2, 0, 0, true);
+    
+    return int(PixelTotal/CountTotal);
+  }
+  
+   public int avgY() {
+    PixelTotal = 0;
+    CountTotal = 0;
+    this.pixelList.traverseDF(this.pixelList._root, 2, 0, 0, false);
+    
+    return int(PixelTotal/CountTotal);
   }
   
 }

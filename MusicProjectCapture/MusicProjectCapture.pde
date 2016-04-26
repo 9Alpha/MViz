@@ -2,6 +2,11 @@ import processing.video.*;
 import java.awt.*;
 import java.util.*;
 
+int PixelTotal = 0;
+int CountTotal = 0;
+
+float colorRes = .1;
+
 Capture cam;
 int res = 1;
 int count = 0;
@@ -57,18 +62,21 @@ void draw() {
 
 
     for (int i = 0; i < cam.pixels.length; i+=res) {
-      if (goodPix[i] && hue(cam.pixels[i]) > .8 && saturation(cam.pixels[i]) > .5) {
+      if (goodPix[i] && hue(cam.pixels[i]) > .85 && saturation(cam.pixels[i]) > .5) {
         goodPix[i] = false;
-        colorObject shape = new colorObject(hue(cam.pixels[i])-.01, hue(cam.pixels[i])+.01, saturation(cam.pixels[i]), brightness(cam.pixels[i]), i%width, (int)(i/width));
-        seenObjects.add(flood(shape, i, hue(cam.pixels[i])-.01, hue(cam.pixels[i])+.01, goodPix));
-      }
-      else {
+        colorObject shape = new colorObject(hue(cam.pixels[i])-colorRes, hue(cam.pixels[i])+colorRes, saturation(cam.pixels[i]), brightness(cam.pixels[i]), i%width, (int)(i/width));
+        seenObjects.add(flood(shape, i, hue(cam.pixels[i])-colorRes, hue(cam.pixels[i])+colorRes, goodPix));
+      } else {
         //rect(i%width, (int)(i/width), 1, 1);
       }
     }
 
     for (int i = 0; i < seenObjects.size(); i++) {
-      seenObjects.get(i).pixelList.traverseDF(seenObjects.get(i).pixelList._root, false, 0, 0);
+      //println(i);
+      seenObjects.get(i).outPut();
+      fill(1);
+      textSize(10);
+      text(seenObjects.get(i).avgX()+", "+seenObjects.get(i).avgY(), seenObjects.get(i).avgX()*4, seenObjects.get(i).avgY()*16);
     }
 
     //println("("+map(point2[0], 0, 1, 0, 360)+", "+map(point2[1], 0, 1, 0, 100)+", "+map(point2[2], 0, 1, 0, 100)+")");
@@ -103,7 +111,7 @@ void draw() {
   //image(cam, 0, 0, width, height);
 }
 
-public void search(Node node) {
+public void export(Node node) {
   if (node.parent != null) {
     //fill(color(node.hue, node.sat, node.bri));
     fill(0);
@@ -114,38 +122,47 @@ public void search(Node node) {
   }
 }
 
+public void count(Node node, boolean useX) {
+  if (useX) {
+    PixelTotal+=node.nodeX;
+  } else {
+    PixelTotal+=node.nodeY;
+  }
+  CountTotal++;
+}
+
 
 public colorObject flood(colorObject shape, int start, float low, float high, boolean[] goodPix) {
 
   boolean keepGoing = true;
 
   //while (keepGoing) {
-    keepGoing = false;
-    if (goodPix[start+res] && hue(cam.pixels[start+res]) > low && hue(cam.pixels[start+res]) < high) {
-      shape.addToPixels((start+res)%width, (int)((start+res)/width), (low+high)/2.0, saturation(cam.pixels[start+res]), brightness(cam.pixels[start+res]), (start)%width, (int)((start)/width));
-      goodPix[start+res] = false;
-      //keepGoing = true;
-      //start = start+res;
-      flood(shape, start+res, low, high, goodPix);
-    } else if (goodPix[start+width] && hue(cam.pixels[start+width]) > low && hue(cam.pixels[start+width]) < high) {
-      shape.addToPixels((start+(width*res))%width, (int)((start+(width*res))/width), (low+high)/2.0, saturation(cam.pixels[start+(width*res)]), brightness(cam.pixels[start+(width*res)]), (start)%width, (int)((start)/width));
-      goodPix[start+(width*res)] = false;
-      //keepGoing = true;
-      //start = start+(width*res);
-      flood(shape, start+(width*res), low, high, goodPix);
-    } else if (goodPix[start-1] && hue(cam.pixels[start-1]) > low && hue(cam.pixels[start-1]) < high) {
-      shape.addToPixels((start-res)%width, (int)((start-res)/width), (low+high)/2.0, saturation(cam.pixels[start-res]), brightness(cam.pixels[start-res]), (start)%width, (int)((start)/width));
-      goodPix[start-res] = false;
-      //keepGoing = true;
-      //start = start-res;
-      flood(shape, start-res, low, high, goodPix);
-    } else if (goodPix[start-width] && hue(cam.pixels[start-width]) > low && hue(cam.pixels[start-width]) < high) {
-      shape.addToPixels((start-(width*res))%width, (int)((start-(width*res))/width), (low+high)/2.0, saturation(cam.pixels[start-(width*res)]), brightness(cam.pixels[start-(width*res)]), (start)%width, (int)((start)/width));
-      goodPix[start-(width*res)] = false;
-      //keepGoing = true;
-      //start = start-(width*res);
-      flood(shape, start-(width*res), low, high, goodPix);
-    }
+  keepGoing = false;
+  if (goodPix[start+res] && hue(cam.pixels[start+res]) > low && hue(cam.pixels[start+res]) < high) {
+    shape.addToPixels((start+res)%width, (int)((start+res)/width), (low+high)/2.0, saturation(cam.pixels[start+res]), brightness(cam.pixels[start+res]), (start)%width, (int)((start)/width));
+    goodPix[start+res] = false;
+    //keepGoing = true;
+    //start = start+res;
+    flood(shape, start+res, low, high, goodPix);
+  } else if (goodPix[start+width] && hue(cam.pixels[start+width]) > low && hue(cam.pixels[start+width]) < high) {
+    shape.addToPixels((start+(width*res))%width, (int)((start+(width*res))/width), (low+high)/2.0, saturation(cam.pixels[start+(width*res)]), brightness(cam.pixels[start+(width*res)]), (start)%width, (int)((start)/width));
+    goodPix[start+(width*res)] = false;
+    //keepGoing = true;
+    //start = start+(width*res);
+    flood(shape, start+(width*res), low, high, goodPix);
+  } else if (goodPix[start-1] && hue(cam.pixels[start-1]) > low && hue(cam.pixels[start-1]) < high) {
+    shape.addToPixels((start-res)%width, (int)((start-res)/width), (low+high)/2.0, saturation(cam.pixels[start-res]), brightness(cam.pixels[start-res]), (start)%width, (int)((start)/width));
+    goodPix[start-res] = false;
+    //keepGoing = true;
+    //start = start-res;
+    flood(shape, start-res, low, high, goodPix);
+  } else if (goodPix[start-width] && hue(cam.pixels[start-width]) > low && hue(cam.pixels[start-width]) < high) {
+    shape.addToPixels((start-(width*res))%width, (int)((start-(width*res))/width), (low+high)/2.0, saturation(cam.pixels[start-(width*res)]), brightness(cam.pixels[start-(width*res)]), (start)%width, (int)((start)/width));
+    goodPix[start-(width*res)] = false;
+    //keepGoing = true;
+    //start = start-(width*res);
+    flood(shape, start-(width*res), low, high, goodPix);
+  }
   //}
 
   /* if (goodPix[start+1] && hue(pixels[start+1]) > low && hue(pixels[start+1]) < high) {

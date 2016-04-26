@@ -20,32 +20,35 @@ public class Tree {
    return index;
    }*/
 
-  public Node traverseDF(Node currentNode, boolean add, int px, int py) {
-    if (add) {
+  public Node traverseDF(Node currentNode, int mode, int px, int py, boolean useX) {
+    if (mode == 0) {
       if (currentNode.nodeX == px && currentNode.nodeY == py) {
         return currentNode;
       }
-    } else {
-      search(currentNode);
+    } else if (mode == 1) {
+      export(currentNode);
+    } else if (mode == 2) {
+      count(currentNode, useX);
     }
     Iterator<Node> iterator = currentNode.children.iterator(); //WIP
     while (iterator.hasNext()) {
       Node child = iterator.next();
-      if (!add) {
-        search(child);
+      if (mode == 1) {
+        export(child);
+      } else if (mode == 2) {
+        count(currentNode, useX);
       }
       if (!iterator.hasNext()) {
-        if (add) {
+        if (mode == 0) {
           if (child.nodeX == px && child.nodeY == py) {
-            return child;   
+            return child;
           }
         }
         iterator = child.children.iterator();
         //this.traverseDF(child, add, px, py);
       }
-      
     }
-    
+
     return null;
   }
 
@@ -73,7 +76,7 @@ public class Tree {
     Node child = new Node(x, y, h, s, b);
     Node parent = null;
 
-    parent = this.traverseDF(this._root, true, px, py);
+    parent = this.traverseDF(this._root, 0, px, py, false);
 
     if (parent != null) {
       parent.children.add(child);
