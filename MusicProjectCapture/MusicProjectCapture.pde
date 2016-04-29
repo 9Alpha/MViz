@@ -134,54 +134,31 @@ public void count(Node node, boolean useX) {
 
 public colorObject flood(colorObject shape, int start, float low, float high, boolean[] goodPix) {
 
-  boolean keepGoing = true;
 
-  //while (keepGoing) {
-  keepGoing = false;
   if (goodPix[start+res] && hue(cam.pixels[start+res]) > low && hue(cam.pixels[start+res]) < high) {
     shape.addToPixels((start+res)%width, (int)((start+res)/width), (low+high)/2.0, saturation(cam.pixels[start+res]), brightness(cam.pixels[start+res]), (start)%width, (int)((start)/width));
     goodPix[start+res] = false;
-    //keepGoing = true;
-    //start = start+res;
     flood(shape, start+res, low, high, goodPix);
   } else if (goodPix[start+width] && hue(cam.pixels[start+width]) > low && hue(cam.pixels[start+width]) < high) {
     shape.addToPixels((start+(width*res))%width, (int)((start+(width*res))/width), (low+high)/2.0, saturation(cam.pixels[start+(width*res)]), brightness(cam.pixels[start+(width*res)]), (start)%width, (int)((start)/width));
     goodPix[start+(width*res)] = false;
-    //keepGoing = true;
-    //start = start+(width*res);
     flood(shape, start+(width*res), low, high, goodPix);
   } else if (goodPix[start-1] && hue(cam.pixels[start-1]) > low && hue(cam.pixels[start-1]) < high) {
     shape.addToPixels((start-res)%width, (int)((start-res)/width), (low+high)/2.0, saturation(cam.pixels[start-res]), brightness(cam.pixels[start-res]), (start)%width, (int)((start)/width));
     goodPix[start-res] = false;
-    //keepGoing = true;
-    //start = start-res;
     flood(shape, start-res, low, high, goodPix);
   } else if (goodPix[start-width] && hue(cam.pixels[start-width]) > low && hue(cam.pixels[start-width]) < high) {
     shape.addToPixels((start-(width*res))%width, (int)((start-(width*res))/width), (low+high)/2.0, saturation(cam.pixels[start-(width*res)]), brightness(cam.pixels[start-(width*res)]), (start)%width, (int)((start)/width));
     goodPix[start-(width*res)] = false;
-    //keepGoing = true;
-    //start = start-(width*res);
     flood(shape, start-(width*res), low, high, goodPix);
+  } else {
+    Node node = shape.pixelList.traverseDF(shape.pixelList._root, 0, start%width, (int)(start/width), false);
+    if (node != null) {
+      start = (node.parent.nodeY)*width + node.parent.nodeX;
+      flood(shape, start, low, high, goodPix);
+    }
   }
-  //}
 
-  /* if (goodPix[start+1] && hue(pixels[start+1]) > low && hue(pixels[start+1]) < high) {
-   shape.addToPixels((start+1)%width, (int)((start+1)/width), (low+high)/2.0, (start)%width, (int)((start)/width));
-   goodPix[start+1] = false;
-   flood(shape, start+1, low, high, goodPix);
-   } else if (goodPix[start+width] && hue(pixels[start+width]) > low && hue(pixels[start+width]) < high) {
-   shape.addToPixels((start+width)%width, (int)((start+width)/width), (low+high)/2.0, (start)%width, (int)((start)/width));
-   goodPix[start+width] = false;
-   flood(shape, start+width, low, high, goodPix);
-   } else if (goodPix[start-1] && hue(pixels[start-1]) > low && hue(pixels[start-1]) < high) {
-   shape.addToPixels((start-1)%width, (int)((start-1)/width), (low+high)/2.0, (start)%width, (int)((start)/width));
-   goodPix[start-1] = false;
-   flood(shape, start-1, low, high, goodPix);
-   } else if (goodPix[start-width] && hue(pixels[start-width]) > low && hue(pixels[start-width]) < high) {
-   shape.addToPixels((start-width)%width, (int)((start-width)/width), (low+high)/2.0, (start)%width, (int)((start)/width));
-   goodPix[start-width] = false;
-   flood(shape, start-width, low, high, goodPix);
-   }*/
 
 
   return shape;
