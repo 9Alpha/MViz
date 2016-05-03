@@ -84,7 +84,7 @@ void draw() {
       textSize(10);
       if (hasBase) {
         line(seenObjects.get(i).avgX()*4, seenObjects.get(i).avgY()*16, base.avgX()*4, base.avgY()*16);
-        text(seenObjects.get(i).avgX()+", "+seenObjects.get(i).avgY(), seenObjects.get(i).avgX()*4, seenObjects.get(i).avgY()*16);
+        //text(seenObjects.get(i).avgX()+", "+seenObjects.get(i).avgY(), seenObjects.get(i).avgX()*4, seenObjects.get(i).avgY()*16);
       }
      noStroke();
     }
