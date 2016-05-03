@@ -62,7 +62,7 @@ void draw() {
 
 
     for (int i = 0; i < cam.pixels.length; i+=res) {
-      if (goodPix[i] && hue(cam.pixels[i]) > .85 && saturation(cam.pixels[i]) > .5) {
+      if (goodPix[i] && hue(cam.pixels[i]) < .45 && hue(cam.pixels[i]) > .222 && saturation(cam.pixels[i]) > .4) {
         goodPix[i] = false;
         colorObject shape = new colorObject(hue(cam.pixels[i])-colorRes, hue(cam.pixels[i])+colorRes, saturation(cam.pixels[i]), brightness(cam.pixels[i]), i%width, (int)(i/width));
         seenObjects.add(flood(shape, i, hue(cam.pixels[i])-colorRes, hue(cam.pixels[i])+colorRes, goodPix));
@@ -114,7 +114,7 @@ void draw() {
 public void export(Node node) {
   if (node.parent != null) {
     //fill(color(node.hue, node.sat, node.bri));
-    fill(0);
+    fill(1, 1, 1);
     rect(node.nodeX*4, node.nodeY*16, res*16, res*16);
     //println("Node: ("+node.nodeX+", "+node.nodeY+")  Parent: "+"("+node.parent.nodeX+", "+node.parent.nodeY+")");
   } else {
@@ -154,8 +154,8 @@ public colorObject flood(colorObject shape, int start, float low, float high, bo
   } else {
     Node node = shape.pixelList.traverseDF(shape.pixelList._root, 0, start%width, (int)(start/width), false);
     if (node != null) {
-      start = (node.parent.nodeY)*width + node.parent.nodeX;
-      flood(shape, start, low, high, goodPix);
+      //start = (node.parent.nodeY)*width + node.parent.nodeX;
+      //flood(shape, start, low, high, goodPix);
     }
   }
 
