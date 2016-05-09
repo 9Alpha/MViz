@@ -28,7 +28,21 @@ public class Tree {
     } else if (mode == 1) {
       export(currentNode);
     } else if (mode == 2) {
-      count(currentNode, useX);
+      if (currentNode.nodeX > rightNodeX) {
+        rightNodeX = currentNode.nodeX;
+      }
+    } else if (mode == 3) {
+      if (currentNode.nodeX < leftNodeX) {
+        leftNodeX = currentNode.nodeX;
+      }
+    } else if (mode == 4) {
+      if (currentNode.nodeY > largestNodeY) {
+        largestNodeY = currentNode.nodeY;
+      }
+    } else if (mode == 5) {
+      if (currentNode.nodeY < smallestNodeY) {
+        smallestNodeY = currentNode.nodeY;
+      }
     }
     Iterator<Node> iterator = currentNode.children.iterator(); //WIP
     while (iterator.hasNext()) {
@@ -36,7 +50,21 @@ public class Tree {
       if (mode == 1) {
         export(child);
       } else if (mode == 2) {
-        count(currentNode, useX);
+        if (child.nodeX > rightNodeX) {
+          rightNodeX = child.nodeX;
+        }
+      } else if (mode == 3) {
+        if (child.nodeX < leftNodeX) {
+          leftNodeX = child.nodeX;
+        }
+      } else if (mode == 4) {
+        if (child.nodeY > largestNodeY) {
+          largestNodeY = child.nodeY;
+        }
+      } else if (mode == 5) {
+        if (child.nodeY < smallestNodeY) {
+          smallestNodeY = child.nodeY;
+        }
       }
       if (!iterator.hasNext()) {
         if (mode == 0) {

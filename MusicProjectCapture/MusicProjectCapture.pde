@@ -7,6 +7,11 @@ int CountTotal = 0;
 int Cwidth = 80;
 int Cheight = 45;
 
+int largestNodeY = 0; 
+int smallestNodeY = Cheight+10;
+int leftNodeX = Cwidth+10; 
+int rightNodeX = 0;
+
 float colorRes = .1;
 colorObject base;
 boolean hasBase = false;
@@ -85,7 +90,13 @@ void draw() {
       strokeWeight(1);
       textSize(10);
       if (hasBase) {
-        line(seenObjects.get(i).avgX(), seenObjects.get(i).avgY(), base.avgX(), base.avgY());
+        println(base.rightX);
+        rectMode(CORNERS);
+        fill(0);
+        rect(base.leftX + 100, base.lowY, base.rightX + 100, base.highY);
+        fill(1);
+        rectMode(CORNER);
+        line(seenObjects.get(i).centerX, seenObjects.get(i).centerY, base.centerX, base.centerY);
         //text(seenObjects.get(i).avgX()+", "+seenObjects.get(i).avgY(), seenObjects.get(i).avgX()*4, seenObjects.get(i).avgY()*16);
       }
      noStroke();
