@@ -54,6 +54,7 @@ public boolean[] updateGood(int top, boolean[] grid) {
 
 void draw() {
   if (cam.available() == true) {
+    background(.7);
     cam.read();
 
     //set(0, 0, cam);
@@ -72,13 +73,14 @@ void draw() {
 
 
     for (int i = 0; i < cam.pixels.length; i+=res) {
-      if (goodPix[i] && hue(cam.pixels[i]) > .7 && saturation(cam.pixels[i]) > .3) {
+      if (goodPix[i] && hue(cam.pixels[i]) < .389 && hue(cam.pixels[i]) > .222 && saturation(cam.pixels[i]) > .3) {
         goodPix[i] = false;
         colorObject shape = new colorObject(hue(cam.pixels[i])-colorRes, hue(cam.pixels[i])+colorRes, saturation(cam.pixels[i]), brightness(cam.pixels[i]), i%Cwidth, (int)(i/Cwidth));
         seenObjects.add(flood(shape, i, hue(cam.pixels[i])-colorRes, hue(cam.pixels[i])+colorRes, goodPix));
-      } else  if (goodPix[i] && hue(cam.pixels[i]) < .694 && hue(cam.pixels[i]) > .556 && saturation(cam.pixels[i]) > .3) {
+      } else  if (goodPix[i] && hue(cam.pixels[i]) < .694 && hue(cam.pixels[i]) > .4 && saturation(cam.pixels[i]) > .2) {
         hasBase = true;
-        base = new colorObject(hue(cam.pixels[i])-colorRes, hue(cam.pixels[i])+colorRes, saturation(cam.pixels[i]), brightness(cam.pixels[i]), i%Cwidth, (int)(i/Cwidth));
+        colorObject shape2 = new colorObject(hue(cam.pixels[i])-colorRes, hue(cam.pixels[i])+colorRes, saturation(cam.pixels[i]), brightness(cam.pixels[i]), i%Cwidth, (int)(i/Cwidth));
+        base = flood(shape2, i, hue(cam.pixels[i])-colorRes, hue(cam.pixels[i])+colorRes, goodPix);
       }
     }
 
@@ -90,16 +92,24 @@ void draw() {
       strokeWeight(1);
       textSize(10);
       if (hasBase) {
-        println(base.rightX);
+        base.outPut();
         rectMode(CORNERS);
         fill(0);
-        rect(base.leftX + 100, base.lowY, base.rightX + 100, base.highY);
+        rect(base.leftX + 200, base.lowY, base.rightX + 200, base.highY);
+        for (float j = 0; j < 6; j++) {
+          line(base.rightX + 200, base.lowY + int(float(base.highY-base.lowY)*(j/5.0)), base.rightX + 100, base.lowY + int(float(base.highY-base.lowY)*(j/5.0)));
+        }
         fill(1);
         rectMode(CORNER);
         line(seenObjects.get(i).centerX, seenObjects.get(i).centerY, base.centerX, base.centerY);
         //text(seenObjects.get(i).avgX()+", "+seenObjects.get(i).avgY(), seenObjects.get(i).avgX()*4, seenObjects.get(i).avgY()*16);
       }
-     noStroke();
+      rectMode(CORNERS);
+      fill(0);
+      rect(seenObjects.get(i).leftX + 200, seenObjects.get(i).lowY, seenObjects.get(i).rightX + 200, seenObjects.get(i).highY);
+      fill(1);
+      rectMode(CORNER);
+      noStroke();
     }
 
     //println("("+map(point2[0], 0, 1, 0, 360)+", "+map(point2[1], 0, 1, 0, 100)+", "+map(point2[2], 0, 1, 0, 100)+")");
@@ -122,14 +132,6 @@ public void export(Node node) {
   }
 }
 
-public void count(Node node, boolean useX) {
-  if (useX) {
-    PixelTotal+=node.nodeX;
-  } else {
-    PixelTotal+=node.nodeY;
-  }
-  CountTotal++;
-}
 
 
 public colorObject flood(colorObject shape, int start, float low, float high, boolean[] goodPix) {

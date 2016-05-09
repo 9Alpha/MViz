@@ -31,7 +31,6 @@ public class colorObject {
   public int rX() {
     rightNodeX = 0;
     this.pixelList.traverseDF(this.pixelList._root, 2, 0, 0, false);
-    println(rightNodeX);
     return rightNodeX;
   }
 
