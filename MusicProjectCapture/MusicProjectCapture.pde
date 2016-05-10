@@ -73,43 +73,39 @@ void draw() {
 
 
     for (int i = 0; i < cam.pixels.length; i+=res) {
-      if (goodPix[i] && hue(cam.pixels[i]) < .389 && hue(cam.pixels[i]) > .222 && saturation(cam.pixels[i]) > .3) {
+      if (goodPix[i] && hue(cam.pixels[i]) > .7 && saturation(cam.pixels[i]) > .3) { //reds
+        //if (goodPix[i] && hue(cam.pixels[i]) < .389 && hue(cam.pixels[i]) > .222 && saturation(cam.pixels[i]) > .3) {  //greens
         goodPix[i] = false;
         colorObject shape = new colorObject(hue(cam.pixels[i])-colorRes, hue(cam.pixels[i])+colorRes, saturation(cam.pixels[i]), brightness(cam.pixels[i]), i%Cwidth, (int)(i/Cwidth));
         seenObjects.add(flood(shape, i, hue(cam.pixels[i])-colorRes, hue(cam.pixels[i])+colorRes, goodPix));
-      } else  if (goodPix[i] && hue(cam.pixels[i]) < .694 && hue(cam.pixels[i]) > .4 && saturation(cam.pixels[i]) > .2) {
+      } else  if (goodPix[i] && hue(cam.pixels[i]) < .694 && hue(cam.pixels[i]) > .4 && saturation(cam.pixels[i]) > .3) { //blues
         hasBase = true;
         colorObject shape2 = new colorObject(hue(cam.pixels[i])-colorRes, hue(cam.pixels[i])+colorRes, saturation(cam.pixels[i]), brightness(cam.pixels[i]), i%Cwidth, (int)(i/Cwidth));
         base = flood(shape2, i, hue(cam.pixels[i])-colorRes, hue(cam.pixels[i])+colorRes, goodPix);
       }
     }
 
-    for (int i = 0; i < seenObjects.size(); i++) {
-      //println(i);
-      seenObjects.get(i).outPut();
+
+    if (hasBase) {
       fill(1);
       stroke(1);
-      strokeWeight(1);
-      textSize(10);
-      if (hasBase) {
-        base.outPut();
-        rectMode(CORNERS);
-        fill(0);
-        rect(base.leftX + 200, base.lowY, base.rightX + 200, base.highY);
-        for (float j = 0; j < 6; j++) {
-          line(base.rightX + 200, base.lowY + int(float(base.highY-base.lowY)*(j/5.0)), base.rightX + 100, base.lowY + int(float(base.highY-base.lowY)*(j/5.0)));
-        }
-        fill(1);
-        rectMode(CORNER);
-        line(seenObjects.get(i).centerX, seenObjects.get(i).centerY, base.centerX, base.centerY);
-        //text(seenObjects.get(i).avgX()+", "+seenObjects.get(i).avgY(), seenObjects.get(i).avgX()*4, seenObjects.get(i).avgY()*16);
-      }
+      base.outPut();
       rectMode(CORNERS);
       fill(0);
-      rect(seenObjects.get(i).leftX + 200, seenObjects.get(i).lowY, seenObjects.get(i).rightX + 200, seenObjects.get(i).highY);
-      fill(1);
-      rectMode(CORNER);
+      rect(base.leftX + 200, base.lowY, base.rightX + 200, base.highY);
+      for (float j = 0; j < 6; j++) {
+        line(base.rightX + 200, base.lowY + int(float(base.highY-base.lowY)*(j/5.0)), base.rightX + 100, base.lowY + int(float(base.highY-base.lowY)*(j/5.0)));
+      }
       noStroke();
+      fill(1, 1, 1);
+      for (int i = 0; i < seenObjects.size(); i++) {
+        rectMode(CORNERS);
+        rect(seenObjects.get(i).leftX + 200, seenObjects.get(i).lowY, seenObjects.get(i).rightX + 200, seenObjects.get(i).highY);
+        rectMode(CORNER);
+        seenObjects.get(i).outPut();
+      }    
+      rectMode(CORNER);
+      
     }
 
     //println("("+map(point2[0], 0, 1, 0, 360)+", "+map(point2[1], 0, 1, 0, 100)+", "+map(point2[2], 0, 1, 0, 100)+")");
@@ -122,14 +118,7 @@ void draw() {
 }
 
 public void export(Node node) {
-  if (node.parent != null) {
-    //fill(color(node.hue, node.sat, node.bri));
-    fill(1, 1, 1);
-    rect(node.nodeX, node.nodeY, res, res);
-    //println("Node: ("+node.nodeX+", "+node.nodeY+")  Parent: "+"("+node.parent.nodeX+", "+node.parent.nodeY+")");
-  } else {
-    //println("Node: ("+node.nodeX+", "+node.nodeY+")  Parent: _root");
-  }
+  rect(node.nodeX, node.nodeY, res, res);
 }
 
 
