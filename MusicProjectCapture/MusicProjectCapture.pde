@@ -73,12 +73,12 @@ void draw() {
 
 
     for (int i = 0; i < cam.pixels.length; i+=res) {
-      if (goodPix[i] && hue(cam.pixels[i]) > .7 && saturation(cam.pixels[i]) > .3) { //reds
-        //if (goodPix[i] && hue(cam.pixels[i]) < .389 && hue(cam.pixels[i]) > .222 && saturation(cam.pixels[i]) > .3) {  //greens
+      //if (goodPix[i] && hue(cam.pixels[i]) > .7 && saturation(cam.pixels[i]) > .3) { //reds
+      if (goodPix[i] && hue(cam.pixels[i]) < .389 && hue(cam.pixels[i]) > .222 && saturation(cam.pixels[i]) > .2) {  //greens
         goodPix[i] = false;
         colorObject shape = new colorObject(hue(cam.pixels[i])-colorRes, hue(cam.pixels[i])+colorRes, saturation(cam.pixels[i]), brightness(cam.pixels[i]), i%Cwidth, (int)(i/Cwidth));
         seenObjects.add(flood(shape, i, hue(cam.pixels[i])-colorRes, hue(cam.pixels[i])+colorRes, goodPix));
-      } else  if (goodPix[i] && hue(cam.pixels[i]) < .694 && hue(cam.pixels[i]) > .4 && saturation(cam.pixels[i]) > .3) { //blues
+      } else if (goodPix[i] && hue(cam.pixels[i]) > .7 && saturation(cam.pixels[i]) < .1) { //reds //if (goodPix[i] && hue(cam.pixels[i]) < .694 && hue(cam.pixels[i]) > .4 && saturation(cam.pixels[i]) > .3) { //blues
         hasBase = true;
         colorObject shape2 = new colorObject(hue(cam.pixels[i])-colorRes, hue(cam.pixels[i])+colorRes, saturation(cam.pixels[i]), brightness(cam.pixels[i]), i%Cwidth, (int)(i/Cwidth));
         base = flood(shape2, i, hue(cam.pixels[i])-colorRes, hue(cam.pixels[i])+colorRes, goodPix);
@@ -105,7 +105,6 @@ void draw() {
         seenObjects.get(i).outPut();
       }    
       rectMode(CORNER);
-      
     }
 
     //println("("+map(point2[0], 0, 1, 0, 360)+", "+map(point2[1], 0, 1, 0, 100)+", "+map(point2[2], 0, 1, 0, 100)+")");
