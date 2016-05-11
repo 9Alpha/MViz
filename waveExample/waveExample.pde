@@ -5,7 +5,7 @@ AudioIn in;
 
 int[] array = new int[5000];
 int index = 0;
-int speed = 4;
+int speed = 1;
 double amp = 1;
 float freq = speed;
 
@@ -34,7 +34,7 @@ void draw() {
   //println(speed);
 
   //buffer[start] = (int)(amp*(int)(25*Math.sin(index/20.0*freq)));
-  buffer[start] = (int)(Amp.analyze()*500);
+  buffer[start] = (int)(Amp.analyze()*500)*(int)(25*Math.sin(index/20.0*freq));
 
   if(start >= buffer.length - speed) {
     start = 0;
@@ -48,10 +48,9 @@ void draw() {
     start+=speed;
     end+=speed;
   }
-  if(index == array.length - 1) 
-    index = 0;
-  else
-    index++;
+ 
+  
+  index++;
   
   //if(start%50 == 0) 
 
