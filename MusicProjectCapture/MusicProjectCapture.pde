@@ -34,7 +34,7 @@ String searchReturn = "";
 void setup() {
   size(640, 180);
   noStroke();
-  colorMode(HSB, 1);
+  colorMode(HSB, 1, 1, 1);
   String[] cameras = Capture.list();
   for (int i = 0; i < cameras.length; i++) {
     println("["+i+"]: "+cameras[i]);
@@ -83,14 +83,13 @@ void draw() {
     if (count > 15) {
       for (int i = 0; i < cam.pixels.length; i+=res) {
         //if (goodPix[i] && hue(cam.pixels[i]) > .7 && saturation(cam.pixels[i]) > .3) { //reds
-        if (goodPix[i] && hue(cam.pixels[i]) < .4 && hue(cam.pixels[i]) > .2 && saturation(cam.pixels[i]) > .4) {  //greens
+        if (goodPix[i] && hue(cam.pixels[i]) < .5 && hue(cam.pixels[i]) > .4 && saturation(cam.pixels[i]) < .6 && saturation(cam.pixels[i]) > .4) {  //greens
           goodPix[i] = false;
           colorObject shape = new colorObject(hue(cam.pixels[i])-colorRes, hue(cam.pixels[i])+colorRes, 
             saturation(cam.pixels[i]), brightness(cam.pixels[i]), i%Cwidth, (int)(i/Cwidth));
           seenObjects.add(flood(shape, i, hue(cam.pixels[i])-colorRes, hue(cam.pixels[i])+colorRes, saturation(cam.pixels[i])-colorRes, saturation(cam.pixels[i])+colorRes, goodPix));
-        } else //if (goodPix[i] && hue(cam.pixels[i]) < .389 && brightness(cam.pixels[i]) == 0 && 
-        //saturation(cam.pixels[i]) == 0) { //blacks 
-        if (goodPix[i] && hue(cam.pixels[i]) < .681 && hue(cam.pixels[i]) > .597 && saturation(cam.pixels[i]) > .8) { //blues
+        } else if (goodPix[i] && hue(cam.pixels[i]) > .6 && hue(cam.pixels[i]) < .7 && saturation(cam.pixels[i]) > .3) { //blue? 
+        //if (goodPix[i] && hue(cam.pixels[i]) < .7 && hue(cam.pixels[i]) > .65 && saturation(cam.pixels[i]) > .8) { //blues
           hasBase = true;
           colorObject shape2 = new colorObject(hue(cam.pixels[i])-colorRes, hue(cam.pixels[i])+colorRes, 
             saturation(cam.pixels[i]), brightness(cam.pixels[i]), i%Cwidth, (int)(i/Cwidth));

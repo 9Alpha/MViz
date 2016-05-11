@@ -3,15 +3,12 @@ import java.awt.*;
 import java.util.*;
 
 Capture cam;
-int res = 1;
 int count = 0;
 float[] hsbVals = new float[3];
 
 void setup() {
-
-  size(800, 448);
-  noStroke();
-  colorMode(HSB, 1);
+  size(960, 540);
+  colorMode(HSB);
   String[] cameras = Capture.list();
   for (int i = 0; i < cameras.length; i++) {
     println("["+i+"]: "+cameras[i]);
@@ -21,23 +18,29 @@ void setup() {
   cam.start();
 }
 
-
 void draw() {
   if (cam.available() == true) {
     cam.read();
+    
 
     cam.loadPixels();
-
-
-
-    for (int i = 0; i < cam.pixels.length; i+=res) {
-      if (hue(cam.pixels[i]) > .8 && saturation(cam.pixels[i]) > .5) {
-         cam.pixels[i] = color(0, 0, 0);
-      }
-    }
+    loadPixels();
+    color point = color(get(mouseX, mouseY));
     
+    int r = (point)&0xFF;
+    int g = (point>>8)&0xFF;
+    int b = (point>>16)&0xFF;
+    int a = (point>>24)&0xFF;
     
+    float[] point2 = Color.RGBtoHSB(r, g, b, hsbVals);
+    
+    println("("+point2[0]+", "+point2[1]+", "+point2[2]+")");
     cam.updatePixels();
-    set(0, 0, cam);
   }
+
+  image(cam, 0, 0, width, height); //set(0, 0, cam);
+}
+
+public void flood(int start, float low, float high) {
+  
 }
