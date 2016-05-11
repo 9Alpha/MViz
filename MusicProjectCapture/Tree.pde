@@ -43,6 +43,8 @@ public class Tree {
       if (currentNode.nodeY < smallestNodeY) {
         smallestNodeY = currentNode.nodeY;
       }
+    } else if (mode == 6) {
+      PixelTotal++;
     }
     Iterator<Node> iterator = currentNode.children.iterator(); //WIP
     while (iterator.hasNext()) {
@@ -65,6 +67,8 @@ public class Tree {
         if (child.nodeY < smallestNodeY) {
           smallestNodeY = child.nodeY;
         }
+      } else if (mode == 6) {
+        PixelTotal++;
       }
       if (!iterator.hasNext()) {
         if (mode == 0) {

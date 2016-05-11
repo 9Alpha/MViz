@@ -7,6 +7,12 @@ int CountTotal = 0;
 int Cwidth = 80;
 int Cheight = 45;
 
+float fretToNeck = .6875;
+
+int[] tuning = {16, 21, 26, 31, 35, 40};
+String[] noteNames = {"C", "C#/Db", "D", "D#/Eb", "E", "F", "F#/Gb", "G", "G#/Ab", "A", "A#/Bb", "B"};
+int[] altTuning = new int[6];
+
 int largestNodeY = 0; 
 int smallestNodeY = Cheight+10;
 int leftNodeX = Cwidth+10; 
@@ -53,7 +59,9 @@ public boolean[] updateGood(int top, boolean[] grid) {
 }
 
 void draw() {
+
   if (cam.available() == true) {
+    count++;
     background(.7);
     cam.read();
 
@@ -69,45 +77,73 @@ void draw() {
     }
     goodPix = updateGood(cam.pixels.length, goodPix);
     LinkedList<colorObject> seenObjects = new LinkedList<colorObject>();
+    LinkedList<colorObject> bases = new LinkedList<colorObject>();
 
 
-
-    for (int i = 0; i < cam.pixels.length; i+=res) {
-      //if (goodPix[i] && hue(cam.pixels[i]) > .7 && saturation(cam.pixels[i]) > .3) { //reds
-      if (goodPix[i] && hue(cam.pixels[i]) < .389 && hue(cam.pixels[i]) > .222 && saturation(cam.pixels[i]) > .2) {  //greens
-        goodPix[i] = false;
-        colorObject shape = new colorObject(hue(cam.pixels[i])-colorRes, hue(cam.pixels[i])+colorRes, saturation(cam.pixels[i]), brightness(cam.pixels[i]), i%Cwidth, (int)(i/Cwidth));
-        seenObjects.add(flood(shape, i, hue(cam.pixels[i])-colorRes, hue(cam.pixels[i])+colorRes, goodPix));
-      } else if (goodPix[i] && hue(cam.pixels[i]) > .7 && saturation(cam.pixels[i]) < .1) { //reds //if (goodPix[i] && hue(cam.pixels[i]) < .694 && hue(cam.pixels[i]) > .4 && saturation(cam.pixels[i]) > .3) { //blues
-        hasBase = true;
-        colorObject shape2 = new colorObject(hue(cam.pixels[i])-colorRes, hue(cam.pixels[i])+colorRes, saturation(cam.pixels[i]), brightness(cam.pixels[i]), i%Cwidth, (int)(i/Cwidth));
-        base = flood(shape2, i, hue(cam.pixels[i])-colorRes, hue(cam.pixels[i])+colorRes, goodPix);
+    if (count > 15) {
+      for (int i = 0; i < cam.pixels.length; i+=res) {
+        //if (goodPix[i] && hue(cam.pixels[i]) > .7 && saturation(cam.pixels[i]) > .3) { //reds
+        if (goodPix[i] && hue(cam.pixels[i]) < .4 && hue(cam.pixels[i]) > .2 && saturation(cam.pixels[i]) > .4) {  //greens
+          goodPix[i] = false;
+          colorObject shape = new colorObject(hue(cam.pixels[i])-colorRes, hue(cam.pixels[i])+colorRes, 
+            saturation(cam.pixels[i]), brightness(cam.pixels[i]), i%Cwidth, (int)(i/Cwidth));
+          seenObjects.add(flood(shape, i, hue(cam.pixels[i])-colorRes, hue(cam.pixels[i])+colorRes, saturation(cam.pixels[i])-colorRes, saturation(cam.pixels[i])+colorRes, goodPix));
+        } else //if (goodPix[i] && hue(cam.pixels[i]) < .389 && brightness(cam.pixels[i]) == 0 && 
+        //saturation(cam.pixels[i]) == 0) { //blacks 
+        if (goodPix[i] && hue(cam.pixels[i]) < .681 && hue(cam.pixels[i]) > .597 && saturation(cam.pixels[i]) > .8) { //blues
+          hasBase = true;
+          colorObject shape2 = new colorObject(hue(cam.pixels[i])-colorRes, hue(cam.pixels[i])+colorRes, 
+            saturation(cam.pixels[i]), brightness(cam.pixels[i]), i%Cwidth, (int)(i/Cwidth));
+          bases.add(flood(shape2, i, hue(cam.pixels[i])-colorRes, hue(cam.pixels[i])+colorRes, saturation(cam.pixels[i])-colorRes, saturation(cam.pixels[i])+colorRes, goodPix));
+        }
       }
     }
 
 
+
     if (hasBase) {
+      int baseNum = 0;
+      int maxBase = 0;
+      for (int i = 0; i < bases.size(); i++) {
+        if (bases.get(i).count() > maxBase) {
+          maxBase = bases.get(i).count();
+          baseNum = i;
+        }
+      }
+
+      base = bases.get(baseNum);
+
       fill(1);
       stroke(1);
       base.outPut();
       rectMode(CORNERS);
       fill(0);
-      rect(base.leftX + 200, base.lowY, base.rightX + 200, base.highY);
+      rect(base.leftX + 200, base.lowY, base.rightX + 200, base.bigY);
       for (float j = 0; j < 6; j++) {
-        line(base.rightX + 200, base.lowY + int(float(base.highY-base.lowY)*(j/5.0)), base.rightX + 100, base.lowY + int(float(base.highY-base.lowY)*(j/5.0)));
+        line(base.rightX + 200, base.lowY + int(float(base.bigY-base.lowY)*(j/5.0)), 
+          base.rightX + 100, base.lowY + int(float(base.bigY-base.lowY)*(j/5.0)));
+        altTuning[(int)j] = tuning[(int)j];
       }
       noStroke();
       fill(1, 1, 1);
       for (int i = 0; i < seenObjects.size(); i++) {
         rectMode(CORNERS);
-        rect(seenObjects.get(i).leftX + 200, seenObjects.get(i).lowY, seenObjects.get(i).rightX + 200, seenObjects.get(i).highY);
+        rect(seenObjects.get(i).leftX + 200, seenObjects.get(i).bigOtherY, seenObjects.get(i).rightX + 200, seenObjects.get(i).bigY);
         rectMode(CORNER);
         seenObjects.get(i).outPut();
-      }    
+        for (float j = 0; j < 6; j++) {
+          if (base.lowY + int(float(base.highY-base.lowY)*(j/5.0)) < seenObjects.get(i).lowY 
+            && base.highY + int(float(base.highY-base.lowY)*(j/5.0)) > seenObjects.get(i).lowY) {
+            altTuning[(int)j] += ((seenObjects.get(i).rightX + seenObjects.get(i).leftX)/2.0) % ((base.highY-base.lowY)*fretToNeck) + 1;
+          }
+        }
+      }
+      for (float j = 0; j < 6; j++) {
+        textSize(int(float(base.bigY-base.lowY)*(1/5.0))/2);
+        text(noteNames[altTuning[(int)j]%12], base.rightX + 250, base.lowY + int(float(base.bigY-base.lowY)*(j/5.0)));
+      }
       rectMode(CORNER);
     }
-
-    //println("("+map(point2[0], 0, 1, 0, 360)+", "+map(point2[1], 0, 1, 0, 100)+", "+map(point2[2], 0, 1, 0, 100)+")");
     cam.updatePixels();
     seenObjects.clear();
   }
@@ -122,30 +158,34 @@ public void export(Node node) {
 
 
 
-public colorObject flood(colorObject shape, int start, float low, float high, boolean[] goodPix) {
+public colorObject flood(colorObject shape, int start, float lowH, float highH, float lowS, float highS, boolean[] goodPix) {
 
 
-  if (goodPix[start+res] && hue(cam.pixels[start+res]) > low && hue(cam.pixels[start+res]) < high) {
-    shape.addToPixels((start+res)%Cwidth, (int)((start+res)/Cwidth), (low+high)/2.0, saturation(cam.pixels[start+res]), brightness(cam.pixels[start+res]), (start)%Cwidth, (int)((start)/Cwidth));
+  if (goodPix[start+res] && hue(cam.pixels[start+res]) > lowH && hue(cam.pixels[start+res]) < highH 
+    && saturation(cam.pixels[start+res]) > lowS && saturation(cam.pixels[start+res]) < highS) {
+    shape.addToPixels((start+res)%Cwidth, (int)((start+res)/Cwidth), (lowH+highH)/2.0, saturation(cam.pixels[start+res]), brightness(cam.pixels[start+res]), (start)%Cwidth, (int)((start)/Cwidth));
     goodPix[start+res] = false;
-    flood(shape, start+res, low, high, goodPix);
-  } else if (goodPix[start+Cwidth] && hue(cam.pixels[start+Cwidth]) > low && hue(cam.pixels[start+Cwidth]) < high) {
-    shape.addToPixels((start+(Cwidth*res))%Cwidth, (int)((start+(Cwidth*res))/Cwidth), (low+high)/2.0, saturation(cam.pixels[start+(Cwidth*res)]), brightness(cam.pixels[start+(Cwidth*res)]), (start)%Cwidth, (int)((start)/Cwidth));
+    flood(shape, start+res, lowH, highH, lowS, highS, goodPix);
+  } else if (goodPix[start+Cwidth] && hue(cam.pixels[start+Cwidth]) > lowH && hue(cam.pixels[start+Cwidth]) < highH
+    && saturation(cam.pixels[start+res]) > lowS && saturation(cam.pixels[start+res]) < highS) {
+    shape.addToPixels((start+(Cwidth*res))%Cwidth, (int)((start+(Cwidth*res))/Cwidth), (lowH+highH)/2.0, saturation(cam.pixels[start+(Cwidth*res)]), brightness(cam.pixels[start+(Cwidth*res)]), (start)%Cwidth, (int)((start)/Cwidth));
     goodPix[start+(Cwidth*res)] = false;
-    flood(shape, start+(Cwidth*res), low, high, goodPix);
-  } else if (goodPix[start-1] && hue(cam.pixels[start-1]) > low && hue(cam.pixels[start-1]) < high) {
-    shape.addToPixels((start-res)%Cwidth, (int)((start-res)/Cwidth), (low+high)/2.0, saturation(cam.pixels[start-res]), brightness(cam.pixels[start-res]), (start)%Cwidth, (int)((start)/Cwidth));
+    flood(shape, start+(Cwidth*res), lowH, highH, lowS, highS, goodPix);
+  } else if (goodPix[start-1] && hue(cam.pixels[start-1]) > lowH && hue(cam.pixels[start-1]) < highH
+    && saturation(cam.pixels[start+res]) > lowS && saturation(cam.pixels[start+res]) < highS) {
+    shape.addToPixels((start-res)%Cwidth, (int)((start-res)/Cwidth), (lowH+highH)/2.0, saturation(cam.pixels[start-res]), brightness(cam.pixels[start-res]), (start)%Cwidth, (int)((start)/Cwidth));
     goodPix[start-res] = false;
-    flood(shape, start-res, low, high, goodPix);
-  } else if (goodPix[start-Cwidth] && hue(cam.pixels[start-Cwidth]) > low && hue(cam.pixels[start-Cwidth]) < high) {
-    shape.addToPixels((start-(Cwidth*res))%Cwidth, (int)((start-(Cwidth*res))/Cwidth), (low+high)/2.0, saturation(cam.pixels[start-(Cwidth*res)]), brightness(cam.pixels[start-(Cwidth*res)]), (start)%Cwidth, (int)((start)/Cwidth));
+    flood(shape, start-res, lowH, highH, lowS, highS, goodPix);
+  } else if (goodPix[start-Cwidth] && hue(cam.pixels[start-Cwidth]) > lowH && hue(cam.pixels[start-Cwidth]) < highH 
+    && saturation(cam.pixels[start+res]) > lowS && saturation(cam.pixels[start+res]) < highS) {
+    shape.addToPixels((start-(Cwidth*res))%Cwidth, (int)((start-(Cwidth*res))/Cwidth), (lowH+highH)/2.0, saturation(cam.pixels[start-(Cwidth*res)]), brightness(cam.pixels[start-(Cwidth*res)]), (start)%Cwidth, (int)((start)/Cwidth));
     goodPix[start-(Cwidth*res)] = false;
-    flood(shape, start-(Cwidth*res), low, high, goodPix);
+    flood(shape, start-(Cwidth*res), lowH, highH, lowS, highS, goodPix);
   } else {
     Node node = shape.pixelList.traverseDF(shape.pixelList._root, 0, start%Cwidth, (int)(start/Cwidth), false);
     if (node != null && node.parent != null) {
       start = (node.parent.nodeY)*Cwidth + node.parent.nodeX;
-      flood(shape, start, low, high, goodPix);
+      flood(shape, start, lowH, highH, lowS, highS, goodPix);
     }
   }
 

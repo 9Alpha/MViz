@@ -3,6 +3,7 @@ public class colorObject {
   int leftX, rightX;
   int centerX, centerY;
   int highY, lowY;
+  int bigY, bigOtherY;
   public Tree pixelList;
 
 
@@ -19,6 +20,8 @@ public class colorObject {
     rightX = this.rX();
     leftX = this.lX();
     highY = this.hY();
+    bigY = highY*3;
+    bigOtherY = lowY*3;
     lowY = this.lY();
     centerX = int((rightX+leftX)/2);
     centerY = int((highY+lowY)/2);
@@ -50,5 +53,11 @@ public class colorObject {
     smallestNodeY = Cheight+10;
     this.pixelList.traverseDF(this.pixelList._root, 5, 0, 0, false);
     return smallestNodeY;
+  }
+  
+  public int count() {
+     PixelTotal = 0;
+     this.pixelList.traverseDF(this.pixelList._root, 6, 0, 0, false);
+     return PixelTotal;
   }
 }
