@@ -2,10 +2,10 @@ import processing.sound.*;
 
 AudioIn in;
 FFT fft;
-int bands = 1024;//512
+int bands = 8192;//4096
+float cFreq = 2.692;
 float[] spec = new float[bands];
 float[] spectrum = new float[bands];//array of frequency values
-float[] spectrumCopy = new float[bands];
 
 float[] pureSpectrum;
 
@@ -14,7 +14,8 @@ int speed = 1;
 double amp = 1;//amplitude
 float freq = speed;
 
-int fundamental = 0;
+float estFreq;
+int fundamental = 0;//maximun displayed frequency
 int harmonicCount;//number of pure harmonics
 boolean pure = false;//if pure is activated
 boolean calcFreq = true;//if frequencyCalculation is activated
@@ -24,6 +25,7 @@ String estFreqString = "";
 int sf = 10;//starting frequency
 int frequencies = 10;//number of frequencies desplayed
 int[] selF = new int[frequencies];//array of displayed frequencies
+
 
 int[] buffer = new int[500*frequencies];//all separated waves
 int[] combinedBuffer = new int[500];//combined wave
@@ -72,13 +74,15 @@ void draw() {
     spectrum = spec;
     if(calcFreq == true) {
       int f = 1;
-      for(int i = 1; i < spectrum.length - 1; i++) {
+      for(int i = 100; i < 4000; i++) {
         if(spectrum[i] - spectrum[i-1] > .0001 && spectrum[i] - spectrum[i+1] > .0001 && spectrum[i]*600 >=1) {
-          f = i;
-          break;
+          //if(spectrum[i] > spectrum[f])
+            f = i;
+            break;
         }
       }
-      float estFreq = (spectrum[f-1]*21.53*(f-1)+spectrum[f]*21.53*(f)+spectrum[f+1]*21.53*(f+1))/(spectrum[f-1]+spectrum[f]+spectrum[f+1]);
+      fundamental = f;
+      estFreq = (spectrum[f-1]*cFreq*(f-1)+spectrum[f]*cFreq*(f)+spectrum[f+1]*cFreq*(f+1))/(spectrum[f-1]+spectrum[f]+spectrum[f+1]);
       //println(f*21.53);
       estFreqString = nfc(estFreq,2);
     }
@@ -94,9 +98,7 @@ void draw() {
 
 void splitFrequencies() {
   for(int i = 0; i < frequencies; i++) {
-    spectrum[selF[i]] = (spectrum[selF[i]]+spectrumCopy[selF[i]])/2.0;
-    spectrumCopy[selF[i]] = spectrum[selF[i]];
-    buffer[start[i]] = (int)((spectrum[selF[i]]*600*amp)*Math.sin(index*Math.PI/200.0*(selF[i])));
+    buffer[start[i]] = (int)((spectrum[selF[i]]*600*amp)*Math.sin(index*Math.PI*.0002*(selF[i])));
     
     if(start[i] >= (i+1)*500 - speed) {
       start[i] = i*500;
@@ -117,10 +119,20 @@ void splitFrequencies() {
 void generateWave() {
   combinedBuffer[cStart] = 0;
   
+  if(pure == false) {
+    for(int i = 0; i < spectrum.length; i++) {
+      combinedBuffer[cStart]+=(int)((spectrum[i]*600*amp)*Math.sin(index*Math.PI*.0002*(i)));
+    }//raw 
+  }
   
-  for(int i = 0; i < spectrum.length; i++) {
-    combinedBuffer[cStart]+=(int)((spectrum[i]*600*amp)*Math.sin(index*Math.PI/200.0*(i)));
-  }//raw 
+  else {
+    for(int i = 1; i < spectrum.length; i++) {
+      
+        combinedBuffer[cStart]+=(int)((spectrum[i]*600*amp)*Math.sin(index*Math.PI*.0002*(fundamental * round((float)(i)/(float)(fundamental)))));
+
+    }//pure
+    
+  }
   
   if(cStart >= 500 - speed) {
      cStart = 0;
@@ -138,32 +150,21 @@ void generateWave() {
 }
 
 float[] purifyFFT(float [] f) {
-  harmonicCount = 0;
+  //harmonicCount = 0;
   float[] p = new float [bands];
+  boolean first = true;
   for(int i = 1; i < bands - 1; i++) {
-    if(f[i] - f[i-1] > .0001 && f[i] - f[i+1] > .0001 && f[i]*600 >=1) {
+    if(f[i] - f[i-1] > .00001 && f[i] - f[i+1] > .00001 && f[i]*600 >=1) {
       p[i] = f[i];
-      harmonicCount++;
+      if (first == true) {
+        fundamental = i;
+        first = false;
+      }
     }
     else
       p[i] = 0.0;
   }
   return p;
-}
-
-
-float[] analyzeHarmonics(float [] p) {
-  int c = 0;
-  float[] q = new float[harmonicCount];
-  for(int i = 1; i < p.length - 1; i++) {
-    if(p[i] != 0) {
-      q[c] = p[i];
-      if(c == 0)
-        fundamental = i;
-      c++;
-    } 
-  }
-  return q;
 }
 
 void printWave(int[] wave, int[] s, int[] e) {
@@ -193,7 +194,7 @@ void printWave(int[] wave, int[] s, int[] e) {
         x-=speed;
       
       }
-      text(nfc((float)(selF[f]*21.53),2), 469, (500/(frequencies+1))*(f+1)+10);
+      text(nfc((float)(selF[f]*cFreq),2), 469, (500/(frequencies+1))*(f+1)+10);
     }
     
   }
@@ -248,10 +249,14 @@ void printButtons() {
   
   if(pure == false) {
     fill(120,170,210);
-    rect(508, 300, 90, 100);
+    rect(508, 300, 90, 50);
     fill(0);
     text("Estimate Freq.", 510, 320);
     text(estFreqString + " hz", 520,340);
+    fill(50,200,200);
+    rect(508, 370, 90, 30);
+    fill(0);
+    text("Go to freq.", 520, 390);
   }
   if(pure == true)
     fill(200,200,200);
@@ -320,33 +325,45 @@ void mouseClicked() {
     }
   }
   else if(mouseX > 508 && mouseY > 480 && mouseX <598 && mouseY < 510 && pure == true) {
-    frequencies = harmonicCount;
+    ArrayList<Integer> harmonics = new ArrayList<Integer>();
+    for(int i = 1; i < spectrum.length - 1; i++) {
+      if(spectrum[i] !=0) {
+        harmonics.add(i);
+      } 
+    }
+    frequencies = harmonics.size();
     selF = new int[frequencies];
     buffer = new int[500*frequencies];
 
     start = new int[frequencies];
     end = new int[frequencies];
-    selF = new int[frequencies];
+    
     
     for(int i = 0; i < frequencies; i++) {
       start[i] = i*500;
       end[i] = 500*(i+1)-speed;
     }
-    int c = 0;
-    for(int i = 1; i < spectrum.length - 1; i++) {
-      if(spectrum[i] !=0 && c < harmonicCount) {
-        selF[c] = i;
-        if(c == 0)
-          sf = i;
-        c++;
-      } 
-    }
+    for(int i = 0; i < harmonics.size(); i++) {
+      selF[i] = harmonics.get(i);;
+      if(i == 0)
+        sf = harmonics.get(i);
+    } 
+    
   }
   else if(mouseX > 508 && mouseY > 525 && mouseX <598 && mouseY < 575 ) {
     pure = !pure;
   }
-  else if(mouseX > 508 && mouseY > 300 && mouseX <598 && mouseY < 400  && pure == false) {
+  else if(mouseX > 508 && mouseY > 300 && mouseX <598 && mouseY < 350  && pure == false) {
     calcFreq = !calcFreq;
+  }
+  else if(mouseX > 508 && mouseY > 370 && mouseX <598 && mouseY < 390  && pure == false) {
+    sf = fundamental;
+    for(int i = 0; i < buffer.length; i++) {
+      buffer[i] = 0;
+    }
+    for(int i = 0; i < frequencies; i++) {
+      selF[i] = sf+i;
+    }
   }
   
   
